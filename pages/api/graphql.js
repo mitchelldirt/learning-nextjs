@@ -1,5 +1,5 @@
-import { ApolloServer, gql, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-micro'
-
+import { ApolloServer, gql,  } from 'apollo-server-micro'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 const typeDefs = gql`
 type Query {
 sayHello: String
@@ -14,7 +14,12 @@ const resolvers = {
 	}
 }
 
-const apolloserver = new ApolloServer({typeDefs, resolvers});
+const apolloserver = new ApolloServer({
+	typeDefs, 
+	resolvers,
+	playground: true,
+	plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]	
+});
 
 
 export const config = {
@@ -24,7 +29,12 @@ export const config = {
 	}
 }
 
-export default apolloserver.createHandler({path: '/api/graphql'})
+const startServer = apolloserver.start()
+export default async function handler(req, res) {
+await startServer;
+await apolloserver.createHandler({path: '/api/graphql'})(req, res)
+}
+
 
 //EXAMPLE
 //export default (req, res) => {
